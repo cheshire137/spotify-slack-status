@@ -5,10 +5,22 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Spotify Slack Status</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.min.css" media="screen">
 </head>
 <body>
-  <a href="https://accounts.spotify.com/authorize?client_id=<%= @client_id %>&amp;response_type=code&amp;redirect_uri=<%= @redirect_uri %>&amp;scope=user-read-currently-playing">
-    Sign in with Spotify
-  </a>
+  <section class="hero is-primary">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">Spotify Slack Status</h1>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <a class="button is-large" href="https://accounts.spotify.com/authorize?client_id=<%= @client_id %>&amp;response_type=code&amp;redirect_uri=<%= @redirect_uri %>&amp;scope=user-read-currently-playing">
+        Sign in with Spotify
+      </a>
+    </div>
+  </section>
 </body>
 </html>
