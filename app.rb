@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'dotenv/load'
 
 get '/' do
   @client_id = ENV['SPOTIFY_CLIENT_ID']
