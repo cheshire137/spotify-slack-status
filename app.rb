@@ -73,14 +73,34 @@ get '/user/:id-:user_name' do
   end
 end
 
+post '/update-status' do
+  user = User.where(id: session[:user_id]).first
+
+  unless user
+    status 404
+    erb :not_found
+    return
+  end
+
+  slack_api = SlackApi.new(user.slack_access_token)
+  success = slack_api.set_status(params['status'])
+
+  if success
+    redirect "/user/#{user.to_param}"
+  else
+    status 400
+    "Failed to update Slack status."
+  end
+end
+
 # Callback for Slack OAuth authentication.
 get '/callback/slack' do
   code = params['code']
   redirect_uri = "#{request.base_url}/callback/slack"
 
-  auth_api = SlackAuthApi.new(ENV['SLACK_CLIENT_ID'],
-                              ENV['SLACK_CLIENT_SECRET'])
-  token = auth_api.get_token(code, redirect_uri)
+  slack_auth_api = SlackAuthApi.new(ENV['SLACK_CLIENT_ID'],
+                                    ENV['SLACK_CLIENT_SECRET'])
+  token = slack_auth_api.get_token(code, redirect_uri)
 
   if token
     user = User.find(session[:user_id])
@@ -104,16 +124,16 @@ get '/callback/spotify' do
   code = params['code']
   redirect_uri = escape_url("#{request.base_url}/callback/spotify")
 
-  auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
+  spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
                                 ENV['SPOTIFY_CLIENT_SECRET'])
-  tokens = auth_api.get_tokens(code, redirect_uri)
+  tokens = spotify_auth_api.get_tokens(code, redirect_uri)
 
   if tokens
     access_token = tokens['access_token']
     refresh_token = tokens['refresh_token']
-    api = SpotifyApi.new(access_token)
+    spotify_api = SpotifyApi.new(access_token)
 
-    if me = api.get_me
+    if me = spotify_api.get_me
       user = User.where(email: me['email']).first_or_initialize
       user.spotify_access_token = access_token
       user.spotify_refresh_token = refresh_token

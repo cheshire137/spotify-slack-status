@@ -31,4 +31,10 @@ class SpotifyApi < Fetcher
 
     json
   end
+
+  private
+
+  def get_headers
+    { 'Authorization' => "Bearer #{token}" }
+  end
 end
