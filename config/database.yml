@@ -1,0 +1,15 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: 5
+  timeout: 5000
+
+development:
+  <<: *default
+  database: spotify_slack_status_dev
+
+production:
+  <<: *default
+  database: db/production
