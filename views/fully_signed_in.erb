@@ -38,7 +38,7 @@
       <% if @currently_playing.present? %>
         <div class="columns">
           <div class="column is-half is-offset-one-quarter">
-            <form method="POST" action="/update-status" class="box">
+            <form method="POST" action="/update-status/<%= @slack_token.id %>" class="box">
               <article class="media">
                 <div class="media-content">
                   <p>

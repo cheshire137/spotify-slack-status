@@ -165,7 +165,7 @@ get '/user/:id-:user_name' do
   redirect "/user/#{user.to_param}/#{slack_token.team_id}"
 end
 
-post '/update-status' do
+post '/update-status/:slack_token_id' do
   user = User.where(id: session[:user_id]).first
 
   unless user
@@ -174,11 +174,19 @@ post '/update-status' do
     return
   end
 
-  slack_api = SlackApi.new(user.slack_access_token)
+  slack_token = user.slack_tokens.where(id: params['slack_token_id']).first
+
+  unless slack_token
+    status 404
+    erb :not_found
+    return
+  end
+
+  slack_api = SlackApi.new(slack_token.token)
   success = slack_api.set_status(params['status'])
 
   if success
-    redirect "/user/#{user.to_param}"
+    redirect "/user/#{user.to_param}/#{slack_token.team_id}"
   else
     status 400
     "Failed to update Slack status."
