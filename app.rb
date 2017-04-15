@@ -192,8 +192,17 @@ post '/command/spotify-status' do
                                  slack_user_id: params['user_id']).first
 
   unless slack_token
-    status 404
-    return 'No such Slack user is registered'
+    content_type :json
+    json = {
+      text: 'Please sign into Spotify first.',
+      attachments: [
+        {
+          title: 'Sign in with Spotify',
+          title_link: get_spotify_auth_url
+        }
+      ]
+    }
+    return json.to_json
   end
 
   user = slack_token.user
