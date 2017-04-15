@@ -31,7 +31,7 @@
       <% end %>
       <% if @currently_playing.present? %>
         <p>
-          Listening to: <%= @currently_playing %>
+          🎵 Listening to: <%= @currently_playing %>
         </p>
         <form method="POST" action="/update-status">
           <input type="hidden" name="status" value="Listening to: <%= @currently_playing.gsub(/"/, "'") %>">
