@@ -18,6 +18,11 @@ def get_spotify_auth_api
   SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'], ENV['SPOTIFY_CLIENT_SECRET'])
 end
 
+not_found do
+  status 404
+  erb :not_found
+end
+
 get '/' do
   @client_id = ENV['SPOTIFY_CLIENT_ID']
   @redirect_uri = escape_url("#{request.base_url}/callback/spotify")
