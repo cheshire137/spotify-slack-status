@@ -20,8 +20,6 @@ ActiveRecord::Schema.define(version: 20170415010554) do
     t.string   "user_name",             null: false
     t.string   "spotify_access_token"
     t.string   "spotify_refresh_token"
-    t.string   "slack_user_id"
-    t.string   "slack_user_name"
     t.string   "slack_access_token"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false

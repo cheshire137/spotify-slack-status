@@ -7,6 +7,7 @@ require 'sinatra/activerecord'
 require 'dotenv/load'
 
 require_relative 'models/slack_auth_api'
+require_relative 'models/slack_api'
 require_relative 'models/spotify_auth_api'
 require_relative 'models/spotify_api'
 require_relative 'models/user'
@@ -60,7 +61,15 @@ get '/callback/slack' do
   token = auth_api.get_token(code, redirect_uri)
 
   if token
-    "Signed in with token: #{token}"
+    user = User.find(session[:user_id])
+    user.slack_access_token = token
+
+    if user.save
+      user.inspect
+    else
+      status 422
+      "Failed to update your Spotify Slack Status user info with Slack details."
+    end
   else
     status 401
     "Failed to authenticate with Slack."
