@@ -1,3 +1,13 @@
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.page-root {
+  flex: 1 0 auto;
+}
+
 .avatar {
   display: inline-block;
   vertical-align: middle;
