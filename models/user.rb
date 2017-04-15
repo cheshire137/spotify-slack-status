@@ -3,6 +3,8 @@ class User < ActiveRecord::Base
     :user_name, presence: true
   validates :email, uniqueness: true
 
+  has_many :slack_tokens, dependent: :destroy
+
   def to_param
     "#{id}-#{user_name}"
   end
