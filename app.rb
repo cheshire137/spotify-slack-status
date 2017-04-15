@@ -24,6 +24,15 @@ not_found do
 end
 
 get '/' do
+  if user_id = session[:user_id]
+    user = User.where(id: user_id).first
+
+    if user
+      redirect "/auth/spotify/#{user.to_param}"
+      return
+    end
+  end
+
   @client_id = ENV['SPOTIFY_CLIENT_ID']
   @redirect_uri = escape_url("#{request.base_url}/callback/spotify")
   erb :index
