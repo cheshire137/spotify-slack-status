@@ -1,88 +1,75 @@
-<!DOCTYPE html>
-<html lang="en" class="route-documentation">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spotify Slack Status</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.min.css" media="screen">
-  <link rel="stylesheet" href="/main.css" media="screen">
-</head>
-<body>
-  <section class="hero is-primary">
-    <div class="hero-body">
-      <div class="container">
-        <nav class="nav">
-          <div class="nav-left">
-            <a class="title" href="/user/<%= @user.to_param %>">
-              Spotify Slack Status
-            </a>
-          </div>
-          <div class="nav-right nav-menu">
-            <a href="/logout" class="nav-item">
-              Log out
-            </a>
-          </div>
-        </nav>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <div class="container content">
-      <p class="has-text-centered">
-        You are signed into Spotify as <strong><%= @user.email %></strong>.<br>
-        You are authenticated as <strong><%= @slack_token.user_name %></strong>
-        with the <strong><%= @slack_token.team_name %></strong>
-        team on Slack.
-      </p>
-      <% if @currently_playing.present? %>
-        <div class="columns">
-          <div class="column is-half is-offset-one-quarter">
-            <form method="POST" action="/update-status/<%= @slack_token.id %>" class="box">
-              <article class="media">
-                <div class="media-content">
-                  <p>
-                    🎵 <%= @currently_playing %>
-                  </p>
-                  <input type="hidden" name="status" value="<%= @currently_playing.gsub(/"/, "'") %>">
-                  <p>
-                    <button type="submit" class="button is-slack">
-                      Update Slack Status
-                    </button>
-                  </p>
-                  <p>
-                    <strong>Tip:</strong>
-                    you can also run <code>/spotify-status</code>
-                    from Slack.
-                  </p>
-                </div>
-              </article>
-            </form>
-          </div>
+<section class="hero is-primary">
+  <div class="hero-body">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <a class="title" href="/user/<%= @user.to_param %>">
+            Spotify Slack Status
+          </a>
         </div>
-      <% end %>
+        <div class="nav-right nav-menu">
+          <a href="/logout" class="nav-item">
+            Log out
+          </a>
+        </div>
+      </nav>
     </div>
-  </section>
-  <section class="section">
-    <div class="container content">
-      <% if @other_slacks.any? %>
-        <p>Switch to:</p>
-        <ul>
-          <% @other_slacks.each do |team_id, team_name| %>
-            <li>
-              <a href="/user/<%= @user.to_param %>/<%= team_id %>">
-                <%= team_name %>
-              </a>
-            </li>
-          <% end %>
-        </ul>
-      <% end %>
-      <p>
-        You can also
-        <a href="https://slack.com/oauth/authorize?client_id=<%= @client_id %>&amp;scope=users.profile:write%20team:read&amp;redirect_uri=<%= @redirect_uri %>">
-          sign into a different Slack team</a>.
-      </p>
-    </div>
-  </section>
-</body>
-</html>
+  </div>
+</section>
+<section class="section">
+  <div class="container content">
+    <p class="has-text-centered">
+      You are signed into Spotify as <strong><%= @user.email %></strong>.<br>
+      You are authenticated as <strong><%= @slack_token.user_name %></strong>
+      with the <strong><%= @slack_token.team_name %></strong>
+      team on Slack.
+    </p>
+    <% if @currently_playing.present? %>
+      <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+          <form method="POST" action="/update-status/<%= @slack_token.id %>" class="box">
+            <article class="media">
+              <div class="media-content">
+                <p>
+                  🎵 <%= @currently_playing %>
+                </p>
+                <input type="hidden" name="status" value="<%= @currently_playing.gsub(/"/, "'") %>">
+                <p>
+                  <button type="submit" class="button is-slack">
+                    Update Slack Status
+                  </button>
+                </p>
+                <p>
+                  <strong>Tip:</strong>
+                  you can also run <code>/spotify-status</code>
+                  from Slack.
+                </p>
+              </div>
+            </article>
+          </form>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
+<section class="section">
+  <div class="container content">
+    <% if @other_slacks.any? %>
+      <p>Switch to:</p>
+      <ul>
+        <% @other_slacks.each do |team_id, team_name| %>
+          <li>
+            <a href="/user/<%= @user.to_param %>/<%= team_id %>">
+              <%= team_name %>
+            </a>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <p>
+      You can also
+      <a href="https://slack.com/oauth/authorize?client_id=<%= @client_id %>&amp;scope=users.profile:write%20team:read&amp;redirect_uri=<%= @redirect_uri %>">
+        sign into a different Slack team</a>.
+    </p>
+  </div>
+</section>
