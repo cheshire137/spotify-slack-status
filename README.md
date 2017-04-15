@@ -27,3 +27,28 @@ rake db:migrate
 rackup
 open http://localhost:9292/
 ```
+
+## Deploying to Heroku
+
+Create a [Heroku app](https://dashboard.heroku.com/apps).
+Set `https://your-heroku-app.herokuapp.com/callback/spotify`
+as a redirect URI on your Spotify app. Set
+`https://your-heroku-app.herokuapp.com/callback/slack` as a redirect
+URI on your Slack app.
+
+```bash
+heroku git:remote -a your-heroku-app
+git push heroku master
+heroku run rake db:migrate
+heroku restart
+```
+
+Set environment variables on your Heroku app via:
+
+```bash
+heroku config:set SPOTIFY_CLIENT_ID=
+heroku config:set SPOTIFY_CLIENT_SECRET=
+heroku config:set SLACK_CLIENT_ID=
+heroku config:set SLACK_CLIENT_SECRET=
+heroku config:set SESSION_SECRET=
+```
