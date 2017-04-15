@@ -17,6 +17,16 @@ def escape_url(url)
   URI.escape(url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 end
 
+def get_spotify_auth_url
+  client_id = ENV['SPOTIFY_CLIENT_ID']
+  redirect_uri = escape_url("#{request.base_url}/callback/spotify")
+  scopes = ['user-read-currently-playing', 'user-read-email']
+
+  "https://accounts.spotify.com/authorize?client_id=" +
+    "#{client_id}&response_type=code&redirect_uri=" +
+    "#{redirect_uri}&scope=#{scopes.join('%20')}"
+end
+
 # Updates the Spotify access and refresh tokens for the given User.
 # Returns true on success, false or nil on error.
 def update_spotify_tokens(user)
@@ -57,8 +67,7 @@ get '/' do
     end
   end
 
-  @client_id = ENV['SPOTIFY_CLIENT_ID']
-  @redirect_uri = escape_url("#{request.base_url}/callback/spotify")
+  @auth_url = get_spotify_auth_url
   erb :index
 end
 
