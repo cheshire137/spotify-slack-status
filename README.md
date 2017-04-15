@@ -42,7 +42,8 @@ open http://localhost:9292/
 Set `https://your-heroku-app.herokuapp.com/callback/spotify`
 as a redirect URI on your Spotify app. Set
 `https://your-heroku-app.herokuapp.com/callback/slack` as a redirect
-URI on your Slack app.
+URI on your Slack app. You want the Heroku URL as the first
+redirect URL.
 
 ```bash
 heroku git:remote -a your-heroku-app
