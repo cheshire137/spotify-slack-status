@@ -17,6 +17,15 @@ class SpotifyApi
     "#{name} by #{artists.join(', ')}"
   end
 
+  # https://developer.spotify.com/web-api/get-current-users-profile/
+  def get_me
+    json = get('/me')
+
+    return unless json
+
+    json
+  end
+
   private
 
   def get(path)
