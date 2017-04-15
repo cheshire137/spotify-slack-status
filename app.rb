@@ -16,6 +16,22 @@ def escape_url(url)
   URI.escape(url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 end
 
+# Updates the Spotify access and refresh tokens for the given User.
+# Returns true on success, false or nil on error.
+def update_spotify_tokens(user)
+  spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
+                                        ENV['SPOTIFY_CLIENT_SECRET'])
+  tokens = spotify_auth_api.refresh_tokens(user.spotify_refresh_token)
+
+  if tokens
+    user.spotify_access_token = tokens['access_token']
+    if (refresh_token = tokens['refresh_token']).present?
+      user.spotify_refresh_token = refresh_token
+    end
+    user.save
+  end
+end
+
 enable :sessions
 set :session_secret, ENV['SESSION_SECRET']
 
@@ -47,6 +63,11 @@ end
 
 # User is authenticated with Spotify but not with Slack.
 get '/auth/spotify/:id-:user_name' do
+  unless session[:user_id].to_s == params['id'].to_s
+    redirect '/'
+    return
+  end
+
   @user = User.where(id: params['id'], user_name: params['user_name']).first
   @client_id = ENV['SLACK_CLIENT_ID']
   @redirect_uri = escape_url("#{request.base_url}/callback/slack")
@@ -59,24 +80,13 @@ get '/auth/spotify/:id-:user_name' do
   end
 end
 
-# Updates the Spotify access and refresh tokens for the given User.
-# Returns true on success, false or nil on error.
-def update_spotify_tokens(user)
-  spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
-                                        ENV['SPOTIFY_CLIENT_SECRET'])
-  tokens = spotify_auth_api.refresh_tokens(user.spotify_refresh_token)
-
-  if tokens
-    user.spotify_access_token = tokens['access_token']
-    if (refresh_token = tokens['refresh_token']).present?
-      user.spotify_refresh_token = refresh_token
-    end
-    user.save
-  end
-end
-
 # User is authenticated with both Spotify and Slack.
 get '/user/:id-:user_name' do
+  unless session[:user_id].to_s == params['id'].to_s
+    redirect '/'
+    return
+  end
+
   @user = User.where(id: params['id'], user_name: params['user_name']).first
 
   spotify_api = SpotifyApi.new(@user.spotify_access_token)
