@@ -30,7 +30,7 @@
   <section class="section">
     <div class="container content">
       <p class="has-text-centered">
-        You are signed into Spotify as <strong><%= @user.email %></strong>.
+        You are signed into Spotify as <strong><%= @user.email %></strong>.<br>
         You are authenticated as <strong><%= @slack_token.user_name %></strong>
         with the <strong><%= @slack_token.team_name %></strong>
         team on Slack.
@@ -45,9 +45,16 @@
                     🎵 Listening to: <%= @currently_playing %>
                   </p>
                   <input type="hidden" name="status" value="Listening to: <%= @currently_playing.gsub(/"/, "'") %>">
-                  <button type="submit" class="button is-slack">
-                    Update Slack Status
-                  </button>
+                  <p>
+                    <button type="submit" class="button is-slack">
+                      Update Slack Status
+                    </button>
+                  </p>
+                  <p>
+                    <strong>Tip:</strong>
+                    you can also run <code>/spotify-status</code>
+                    from Slack.
+                  </p>
                 </div>
               </article>
             </form>
