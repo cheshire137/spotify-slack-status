@@ -29,6 +29,17 @@ get '/' do
   erb :index
 end
 
+get '/auth/spotify/:id-:user_name' do
+  @user = User.where(id: params['id'], user_name: params['user_name']).first
+
+  if @user
+    erb :spotify_signed_in
+  else
+    status 404
+    erb :not_found
+  end
+end
+
 get '/callback/spotify' do
   code = params['code']
   redirect_uri = escape_url("#{request.base_url}/callback/spotify")
@@ -48,7 +59,7 @@ get '/callback/spotify' do
       user.user_name = SpotifyApi.get_user_name(me['external_urls']['spotify'])
 
       if user.save
-        "Signed in as #{user.email}"
+        redirect "/auth/spotify/#{user.to_param}"
       else
         "Failed to sign in: #{user.errors.full_messages.join(', ')}"
       end
