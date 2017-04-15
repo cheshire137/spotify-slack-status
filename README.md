@@ -16,15 +16,18 @@ Add `http://localhost:9292/callback/spotify` as a redirect URI.
 
 Create a [Heroku app](https://dashboard.heroku.com/apps).
 
-Create a [Slack app](https://api.slack.com/apps). Add
-`http://localhost:9292/callback/slack` as a redirect URI. Set up a
-"Slash Command" on your app with the name `/spotify-status` and
-the request URL `https://your-heroku-app.herokuapp.com/command/spotify-status`.
-
 ```bash
 bundle install
 cp dotenv.sample .env
 ```
+
+Create a [Slack app](https://api.slack.com/apps). Add
+`http://localhost:9292/callback/slack` as a redirect URI. Set up a
+"Slash Command" on your app with the name `/spotify-status` and
+the request URL `https://your-heroku-app.herokuapp.com/command/spotify-status`.
+When you add the slash command to your Slack app, a verification token
+will appear under "Basic Information". Set this token in your
+.env as `SLACK_VERIFICATION_TOKEN`.
 
 Edit .env to set your Spotify and Slack client IDs and secrets. Run
 `rake generate:secret` and put the output of that as the `SESSION_SECRET`
