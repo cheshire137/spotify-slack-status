@@ -165,7 +165,63 @@ get '/user/:id-:user_name' do
   redirect "/user/#{user.to_param}/#{slack_token.team_id}"
 end
 
+# Callback for Slack command to set the Slack status to the current
+# Spotify track.
+# See https://api.slack.com/slash-commands
+post '/command/spotify-status' do
+  unless params['token'] == ENV['SLACK_VERIFICATION_TOKEN']
+    status 401
+    return 'Invalid verification token'
+  end
+
+  unless params['command'] == '/spotify-status'
+    status 405
+    return 'Invalid command'
+  end
+
+  slack_token = SlackToken.where(team_id: params['team_id'],
+                                 slack_user_id: params['user_id']).first
+
+  unless slack_token
+    status 404
+    return 'No such Slack user is registered'
+  end
+
+  user = slack_token.user
+
+  spotify_api = SpotifyApi.new(user.spotify_access_token)
+  currently_playing = begin
+    spotify_api.get_currently_playing
+  rescue Fetcher::Unauthorized
+    if update_spotify_tokens(user)
+      spotify_api = SpotifyApi.new(user.spotify_access_token)
+      spotify_api.get_currently_playing
+    else
+      status 400
+      return 'Could not get latest Spotify track'
+    end
+  end
+
+  status = "Listening to: #{currently_playing}"
+  slack_api = SlackApi.new(slack_token.token)
+  success = slack_api.set_status(status)
+
+  if success
+    status
+  else
+    status 400
+    'Could not update Slack status'
+  end
+end
+
+# Update the Slack status for the current user using the specified Slack
+# token.
 post '/update-status/:slack_token_id' do
+  unless session[:user_id]
+    redirect '/'
+    return
+  end
+
   user = User.where(id: session[:user_id]).first
 
   unless user

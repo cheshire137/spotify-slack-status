@@ -50,5 +50,6 @@ heroku config:set SPOTIFY_CLIENT_ID=
 heroku config:set SPOTIFY_CLIENT_SECRET=
 heroku config:set SLACK_CLIENT_ID=
 heroku config:set SLACK_CLIENT_SECRET=
+heroku config:set SLACK_VERIFICATION_TOKEN=
 heroku config:set SESSION_SECRET=
 ```
