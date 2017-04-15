@@ -281,6 +281,13 @@ end
 
 # Callback for Slack OAuth authentication.
 get '/callback/slack' do
+  # Maybe the user came straight from the Slack app and has not
+  # yet signed in via Spotify.
+  unless session[:user_id]
+    redirect get_spotify_auth_url
+    return
+  end
+
   code = params['code']
   redirect_uri = "#{request.base_url}/callback/slack"
 
