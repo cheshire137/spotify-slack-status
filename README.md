@@ -2,6 +2,8 @@
 
 Update your Slack status based on the track currently playing in Spotify.
 
+[![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://slack.com/oauth/authorize?&client_id=17070537907.169811790293&scope=users.profile:write,commands)
+
 You can update your status via the `/spotify-status` command in Slack once
 you've added the app to your team's Slack.
 
