@@ -92,14 +92,29 @@ get '/auth/spotify/:id-:user_name' do
   end
 end
 
-# User is authenticated with both Spotify and Slack.
-get '/user/:id-:user_name' do
+# User is authenticated with both Spotify and Slack and is using a
+# particular Slack team they belong to.
+get '/user/:id-:user_name/:team_id' do
   unless session[:user_id].to_s == params['id'].to_s
     redirect '/'
     return
   end
 
   @user = User.where(id: params['id'], user_name: params['user_name']).first
+
+  unless @user
+    status 404
+    erb :not_found
+    return
+  end
+
+  @slack_token = @user.slack_tokens.where(team_id: params['team_id']).first
+
+  unless @slack_token
+    status 404
+    erb :not_found
+    return
+  end
 
   spotify_api = SpotifyApi.new(@user.spotify_access_token)
   @currently_playing = begin
@@ -114,19 +129,43 @@ get '/user/:id-:user_name' do
     end
   end
 
-  @slack_token = @user.latest_slack_token
-
   slack_api = SlackApi.new(@slack_token.token)
   if team_info = slack_api.get_team
     @team_image = team_info['icon']['image_44']
   end
 
-  if @user
-    erb :fully_signed_in
-  else
+  @client_id = ENV['SLACK_CLIENT_ID']
+  @redirect_uri = escape_url("#{request.base_url}/callback/slack")
+
+  @other_slacks = @user.other_slacks(@slack_token.id)
+
+  erb :fully_signed_in
+end
+
+# User is authenticated with both Spotify and Slack.
+get '/user/:id-:user_name' do
+  unless session[:user_id].to_s == params['id'].to_s
+    redirect '/'
+    return
+  end
+
+  user = User.where(id: params['id'], user_name: params['user_name']).first
+
+  unless user
     status 404
     erb :not_found
+    return
   end
+
+  slack_token = user.latest_slack_token
+
+  unless slack_token
+    status 404
+    erb :not_found
+    return
+  end
+
+  redirect "/user/#{user.to_param}/#{slack_token.team_id}"
 end
 
 post '/update-status' do
@@ -162,13 +201,14 @@ get '/callback/slack' do
     slack_api = SlackApi.new(token)
 
     if team_info = slack_api.get_team
-      slack_token = SlackToken.new(user_id: session[:user_id])
+      slack_token = SlackToken.
+        where(user_id: session[:user_id],
+              team_id: team_info['id']).first_or_initialize
       slack_token.token = token
-      slack_token.team_id = team_info['id']
       slack_token.team_name = team_info['name']
 
       if slack_token.save
-        redirect "/user/#{slack_token.user.to_param}"
+        redirect "/user/#{slack_token.user.to_param}/#{slack_token.team_id}"
       else
         status 422
         "Failed to save Slack team info: #{slack_token.errors.full_messages.join(', ')}"

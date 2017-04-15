@@ -16,4 +16,13 @@ class User < ActiveRecord::Base
   def latest_slack_token
     slack_tokens.order("updated_at DESC").first
   end
+
+  # Returns a hash of Slack team IDs and team names, excluding the given
+  # SlackToken ID.
+  def other_slacks(slack_token_id)
+    slack_tokens.where('id <> ?', slack_token_id).
+      order(:team_name).select(:team_id, :team_name).
+      map { |slack_token| [slack_token.team_id, slack_token.team_name] }.
+      to_h
+  end
 end

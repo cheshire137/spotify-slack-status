@@ -59,5 +59,26 @@
       <% end %>
     </div>
   </section>
+  <section class="section">
+    <div class="container content">
+      <% if @other_slacks.any? %>
+        <p>Switch to:</p>
+        <ul>
+          <% @other_slacks.each do |team_id, team_name| %>
+            <li>
+              <a href="/user/<%= @user.to_param %>/<%= team_id %>">
+                <%= team_name %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+      <p>
+        You can also
+        <a href="https://slack.com/oauth/authorize?client_id=<%= @client_id %>&amp;scope=users.profile:write%20team:read&amp;redirect_uri=<%= @redirect_uri %>">
+          sign into a different Slack team</a>.
+      </p>
+    </div>
+  </section>
 </body>
 </html>
