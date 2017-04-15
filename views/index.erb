@@ -7,9 +7,18 @@
   </div>
 </section>
 <section class="section">
-  <div class="container">
-    <a class="button is-large is-spotify" href="<%= @auth_url %>">
-      Sign in with Spotify
-    </a>
+  <div class="container content has-text-centered">
+    <div class="columns">
+      <div class="column is-half is-offset-one-quarter">
+        <p>
+          <a class="button is-large is-spotify" href="<%= @auth_url %>">
+            Sign in with Spotify
+          </a>
+        </p>
+        <p>Sign into Spotify and authorize your Slack team. Then you can use the
+        <code>/spotify-status</code> command to set your Slack status to
+        your current song.</p>
+      </div>
+    </div>
   </div>
 </section>
