@@ -6,6 +6,7 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'dotenv/load'
 
+require_relative 'models/slack_auth_api'
 require_relative 'models/spotify_auth_api'
 require_relative 'models/spotify_api'
 require_relative 'models/user'
@@ -35,6 +36,22 @@ get '/auth/spotify/:id-:user_name' do
   else
     status 404
     erb :not_found
+  end
+end
+
+get '/callback/slack' do
+  code = params['code']
+  redirect_uri = "#{request.base_url}/callback/slack"
+
+  auth_api = SlackAuthApi.new(ENV['SLACK_CLIENT_ID'],
+                              ENV['SLACK_CLIENT_SECRET'])
+  token = auth_api.get_token(code, redirect_uri)
+
+  if token
+    "Signed in with token: #{token}"
+  else
+    status 401
+    "Failed to authenticate with Slack."
   end
 end
 
