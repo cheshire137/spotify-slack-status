@@ -14,10 +14,6 @@ def escape_url(url)
   URI.escape(url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 end
 
-def get_spotify_auth_api
-  SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'], ENV['SPOTIFY_CLIENT_SECRET'])
-end
-
 not_found do
   status 404
   erb :not_found
@@ -44,7 +40,8 @@ get '/callback/spotify' do
   code = params['code']
   redirect_uri = escape_url("#{request.base_url}/callback/spotify")
 
-  auth_api = get_spotify_auth_api
+  auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
+                                ENV['SPOTIFY_CLIENT_SECRET'])
   tokens = auth_api.get_tokens(code, redirect_uri)
 
   if tokens
@@ -61,10 +58,12 @@ get '/callback/spotify' do
       if user.save
         redirect "/auth/spotify/#{user.to_param}"
       else
+        status 422
         "Failed to sign in: #{user.errors.full_messages.join(', ')}"
       end
     end
   else
+    status 401
     "Failed to authenticate with Spotify"
   end
 end
