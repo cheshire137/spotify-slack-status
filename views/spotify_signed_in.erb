@@ -19,7 +19,7 @@
   <section class="section">
     <div class="container content">
       <p>You are signed into Spotify as <strong><%= @user.email %></strong>.</p>
-      <a class="button is-large is-slack" href="https://slack.com/oauth/authorize?client_id=<%= @client_id %>&amp;scope=users.profile:write&amp;redirect_uri=<%= @redirect_uri %>">
+      <a class="button is-large is-slack" href="<%= @auth_url %>">
         Sign in with Slack
       </a>
     </div>

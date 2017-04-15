@@ -27,6 +27,15 @@ def get_spotify_auth_url
     "#{redirect_uri}&scope=#{scopes.join('%20')}"
 end
 
+def get_slack_auth_url
+  client_id = ENV['SLACK_CLIENT_ID']
+  redirect_uri = escape_url("#{request.base_url}/callback/slack")
+  scope = 'users.profile:write'
+
+  "https://slack.com/oauth/authorize?client_id=#{client_id}" +
+    "&scope=#{scope}&redirect_uri=#{redirect_uri}"
+end
+
 # Updates the Spotify access and refresh tokens for the given User.
 # Returns true on success, false or nil on error.
 def update_spotify_tokens(user)
@@ -85,20 +94,19 @@ get '/auth/spotify/:id-:user_name' do
 
   @user = User.where(id: params['id'], user_name: params['user_name']).first
 
+  unless @user
+    status 404
+    erb :not_found
+    return
+  end
+
   if @user.signed_into_slack?
     redirect "/user/#{@user.to_param}"
     return
   end
 
-  @client_id = ENV['SLACK_CLIENT_ID']
-  @redirect_uri = escape_url("#{request.base_url}/callback/slack")
-
-  if @user
-    erb :spotify_signed_in
-  else
-    status 404
-    erb :not_found
-  end
+  @auth_url = get_slack_auth_url
+  erb :spotify_signed_in
 end
 
 # User is authenticated with both Spotify and Slack and is using a
