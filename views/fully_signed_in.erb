@@ -12,7 +12,18 @@
   <section class="hero is-primary">
     <div class="hero-body">
       <div class="container">
-        <h1 class="title">Spotify Slack Status</h1>
+        <nav class="nav">
+          <div class="nav-left">
+            <a class="title" href="/user/<%= @user.to_param %>">
+              Spotify Slack Status
+            </a>
+          </div>
+          <div class="nav-right nav-menu">
+            <a href="/logout" class="nav-item">
+              Log out
+            </a>
+          </div>
+        </nav>
       </div>
     </div>
   </section>

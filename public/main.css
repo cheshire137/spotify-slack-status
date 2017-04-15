@@ -33,3 +33,24 @@
 .button.is-spotify:focus {
   background-color: #5bbe63;
 }
+
+.hero.is-primary .nav,
+.hero .nav {
+  box-shadow: none;
+}
+
+.hero .nav .title {
+  line-height: inherit;
+}
+
+.hero.is-primary .nav-item a:not(.button),
+.hero.is-primary a.nav-item {
+  color: #fff;
+}
+
+.hero.is-primary .nav-item a:not(.button).is-active,
+.hero.is-primary .nav-item a:not(.button):hover,
+.hero.is-primary a.nav-item.is-active,
+.hero.is-primary a.nav-item:hover {
+  text-decoration: underline;
+}

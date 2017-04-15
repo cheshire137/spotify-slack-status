@@ -61,6 +61,11 @@ get '/' do
   erb :index
 end
 
+get '/logout' do
+  session[:user_id] = nil
+  redirect '/'
+end
+
 # User is authenticated with Spotify but not with Slack.
 get '/auth/spotify/:id-:user_name' do
   unless session[:user_id].to_s == params['id'].to_s
