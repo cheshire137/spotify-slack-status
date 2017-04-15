@@ -18,6 +18,16 @@
   <section class="section">
     <div class="container content">
       <p>You are signed in as <strong><%= @user.email %></strong>.</p>
+      <% if @team_name.present? %>
+        <p>
+          You are authenticated with the
+          <% if @team_image.present? %>
+            <img class="avatar" src="<%= @team_image %>" alt="<%= @team_name %> icon" width="22" height="22">
+          <% end %>
+          <strong><%= @team_name %></strong>
+          team on Slack.
+        </p>
+      <% end %>
       <% if @currently_playing.present? %>
         <p>
           Listening to: <%= @currently_playing %>

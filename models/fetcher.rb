@@ -15,7 +15,6 @@ class Fetcher
   def get(path)
     uri = get_uri(path)
     http = get_http(uri)
-
     req = Net::HTTP::Get.new(uri.request_uri, get_headers)
 
     res = http.request(req)
@@ -29,10 +28,8 @@ class Fetcher
   def post(path)
     uri = get_uri(path)
     http = get_http(uri)
-
-    headers = get_headers
-    req = Net::HTTP::Post.new(uri.request_uri, headers)
-    yield req
+    req = Net::HTTP::Post.new(uri.request_uri, get_headers)
+    yield req if block_given?
 
     res = http.request(req)
 
