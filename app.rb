@@ -15,6 +15,9 @@ def escape_url(url)
   URI.escape(url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 end
 
+enable :sessions
+set :session_secret, ENV['SESSION_SECRET']
+
 not_found do
   status 404
   erb :not_found
@@ -75,6 +78,7 @@ get '/callback/spotify' do
       user.user_name = SpotifyApi.get_user_name(me['external_urls']['spotify'])
 
       if user.save
+        session[:user_id] = user.id
         redirect "/auth/spotify/#{user.to_param}"
       else
         status 422
