@@ -69,7 +69,7 @@ get '/' do
       if user.signed_into_slack?
         redirect "/user/#{user.to_param}"
       else
-        redirect "/auth/spotify/#{user.to_param}"
+        redirect get_slack_auth_url
       end
 
       return
@@ -83,30 +83,6 @@ end
 get '/logout' do
   session[:user_id] = nil
   redirect '/'
-end
-
-# User is authenticated with Spotify but not with Slack.
-get '/auth/spotify/:id-:user_name' do
-  unless session[:user_id].to_s == params['id'].to_s
-    redirect '/'
-    return
-  end
-
-  @user = User.where(id: params['id'], user_name: params['user_name']).first
-
-  unless @user
-    status 404
-    erb :not_found
-    return
-  end
-
-  if @user.signed_into_slack?
-    redirect "/user/#{@user.to_param}"
-    return
-  end
-
-  @auth_url = get_slack_auth_url
-  erb :spotify_signed_in
 end
 
 # User is authenticated with both Spotify and Slack and is using a
@@ -362,7 +338,7 @@ get '/callback/spotify' do
 
       if user.save
         session[:user_id] = user.id
-        redirect "/auth/spotify/#{user.to_param}"
+        redirect get_slack_auth_url
       else
         status 422
         "Failed to sign in: #{user.errors.full_messages.join(', ')}"
