@@ -1,4 +1,6 @@
 class Fetcher
+  class Unauthorized < StandardError; end
+
   attr_reader :base_url, :token
 
   def initialize(base_url, token)
@@ -20,6 +22,8 @@ class Fetcher
     res = http.request(req)
     if res.kind_of? Net::HTTPSuccess
       JSON.parse(res.body)
+    elsif res.code == '401'
+      raise Unauthorized, res.message
     end
   end
 

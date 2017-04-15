@@ -59,12 +59,38 @@ get '/auth/spotify/:id-:user_name' do
   end
 end
 
+# Updates the Spotify access and refresh tokens for the given User.
+# Returns true on success, false or nil on error.
+def update_spotify_tokens(user)
+  spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
+                                        ENV['SPOTIFY_CLIENT_SECRET'])
+  tokens = spotify_auth_api.refresh_tokens(user.spotify_refresh_token)
+
+  if tokens
+    user.spotify_access_token = tokens['access_token']
+    if (refresh_token = tokens['refresh_token']).present?
+      user.spotify_refresh_token = refresh_token
+    end
+    user.save
+  end
+end
+
 # User is authenticated with both Spotify and Slack.
 get '/user/:id-:user_name' do
   @user = User.where(id: params['id'], user_name: params['user_name']).first
 
   spotify_api = SpotifyApi.new(@user.spotify_access_token)
-  @currently_playing = spotify_api.get_currently_playing
+  @currently_playing = begin
+    spotify_api.get_currently_playing
+  rescue Fetcher::Unauthorized
+    if update_spotify_tokens(@user)
+      spotify_api = SpotifyApi.new(@user.spotify_access_token)
+      spotify_api.get_currently_playing
+    else
+      status 400
+      return "Failed to get current Spotify track."
+    end
+  end
 
   slack_api = SlackApi.new(@user.slack_access_token)
   team_info = slack_api.get_team
@@ -133,7 +159,7 @@ get '/callback/spotify' do
   redirect_uri = escape_url("#{request.base_url}/callback/spotify")
 
   spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
-                                ENV['SPOTIFY_CLIENT_SECRET'])
+                                        ENV['SPOTIFY_CLIENT_SECRET'])
   tokens = spotify_auth_api.get_tokens(code, redirect_uri)
 
   if tokens
