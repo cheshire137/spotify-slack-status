@@ -24,12 +24,18 @@ not_found do
   erb :not_found
 end
 
+# Landing page for the app. User may already be authenticated with
+# Slack and Spotify, will redirect if so. Otherwise starts auth
+# flow for Spotify.
 get '/' do
   if user_id = session[:user_id]
-    user = User.where(id: user_id).first
+    if user = User.where(id: user_id).first
+      if user.signed_into_slack?
+        redirect "/user/#{user.to_param}"
+      else
+        redirect "/auth/spotify/#{user.to_param}"
+      end
 
-    if user
-      redirect "/auth/spotify/#{user.to_param}"
       return
     end
   end
@@ -39,6 +45,7 @@ get '/' do
   erb :index
 end
 
+# User is authenticated with Spotify but not with Slack.
 get '/auth/spotify/:id-:user_name' do
   @user = User.where(id: params['id'], user_name: params['user_name']).first
   @client_id = ENV['SLACK_CLIENT_ID']
@@ -52,6 +59,19 @@ get '/auth/spotify/:id-:user_name' do
   end
 end
 
+# User is authenticated with both Spotify and Slack.
+get '/user/:id-:user_name' do
+  @user = User.where(id: params['id'], user_name: params['user_name']).first
+
+  if @user
+    erb :fully_signed_in
+  else
+    status 404
+    erb :not_found
+  end
+end
+
+# Callback for Slack OAuth authentication.
 get '/callback/slack' do
   code = params['code']
   redirect_uri = "#{request.base_url}/callback/slack"
@@ -65,7 +85,8 @@ get '/callback/slack' do
     user.slack_access_token = token
 
     if user.save
-      user.inspect
+      session[:user_id] = user.id
+      redirect "/user/#{user.to_param}"
     else
       status 422
       "Failed to update your Spotify Slack Status user info with Slack details."
@@ -76,6 +97,7 @@ get '/callback/slack' do
   end
 end
 
+# Callback for Spotify OAuth authentication.
 get '/callback/spotify' do
   code = params['code']
   redirect_uri = escape_url("#{request.base_url}/callback/spotify")

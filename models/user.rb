@@ -6,4 +6,8 @@ class User < ActiveRecord::Base
   def to_param
     "#{id}-#{user_name}"
   end
+
+  def signed_into_slack?
+    slack_access_token.present?
+  end
 end
