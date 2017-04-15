@@ -12,6 +12,7 @@ need PostgreSQL installed.
 bundle install
 cp dotenv.sample .env
 createdb spotify_slack_status_dev
+rake db:migrate
 ```
 
 Edit .env to set your Spotify app client ID.
