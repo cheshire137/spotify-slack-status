@@ -42,9 +42,9 @@
               <article class="media">
                 <div class="media-content">
                   <p>
-                    🎵 Listening to: <%= @currently_playing %>
+                    🎵 <%= @currently_playing %>
                   </p>
-                  <input type="hidden" name="status" value="Listening to: <%= @currently_playing.gsub(/"/, "'") %>">
+                  <input type="hidden" name="status" value="<%= @currently_playing.gsub(/"/, "'") %>">
                   <p>
                     <button type="submit" class="button is-slack">
                       Update Slack Status
