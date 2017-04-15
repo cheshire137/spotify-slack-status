@@ -74,6 +74,12 @@ get '/auth/spotify/:id-:user_name' do
   end
 
   @user = User.where(id: params['id'], user_name: params['user_name']).first
+
+  if @user.signed_into_slack?
+    redirect "/user/#{@user.to_param}"
+    return
+  end
+
   @client_id = ENV['SLACK_CLIENT_ID']
   @redirect_uri = escape_url("#{request.base_url}/callback/slack")
 
