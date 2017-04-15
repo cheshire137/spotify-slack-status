@@ -2,3 +2,34 @@
   display: inline-block;
   vertical-align: middle;
 }
+
+.button.is-slack,
+.button.is-spotify {
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+
+.button.is-slack {
+  background-color: #f4f3f1;
+  border-color: #edb524;
+  color: #5b3a56;
+}
+
+.button.is-slack:hover,
+.button.is-slack:focus {
+  border-color: #1fa58d;
+}
+
+.button.is-spotify {
+  background-color: #57b660;
+  border-color: transparent;
+  color: #fff;
+}
+
+.button.is-spotify:hover,
+.button.is-spotify:focus {
+  background-color: #5bbe63;
+}
