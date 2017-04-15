@@ -80,6 +80,9 @@ get '/callback/spotify' do
         status 422
         "Failed to sign in: #{user.errors.full_messages.join(', ')}"
       end
+    else
+      status 400
+      "Failed to load Spotify profile info."
     end
   else
     status 401
