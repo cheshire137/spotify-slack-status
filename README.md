@@ -2,13 +2,10 @@
 
 Update your Slack status based on the track currently playing in Spotify.
 
-You can update your status in two ways:
+You can update your status via the `/spotify-status` command in Slack once
+you've added the app to your team's Slack.
 
-- Once you've deployed your app to Heroku (see below), visit
-  `https://your-heroku-app.herokuapp.com/` to sign in with Spotify and
-  Slack, then hit "Update Slack Status".
-- Once you have installed the app into your team's Slack, you can run
-  the command `/spotify-status` from within Slack.
+[![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://slack.com/oauth/authorize?&client_id=17070537907.169811790293&scope=users.profile:write,commands)
 
 ## How to Develop
 
