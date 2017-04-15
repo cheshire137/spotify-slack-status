@@ -8,6 +8,7 @@ require 'dotenv/load'
 
 require_relative 'models/spotify_auth_api'
 require_relative 'models/spotify_api'
+require_relative 'models/user'
 
 def escape_url(url)
   URI.escape(url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
@@ -28,15 +29,25 @@ get '/callback/spotify' do
   redirect_uri = escape_url("#{request.base_url}/callback/spotify")
 
   auth_api = get_spotify_auth_api
-  token = auth_api.get_token(code, redirect_uri)
+  tokens = auth_api.get_tokens(code, redirect_uri)
 
-  if token
-    api = SpotifyApi.new(token)
+  if tokens
+    access_token = tokens['access_token']
+    refresh_token = tokens['refresh_token']
+    api = SpotifyApi.new(access_token)
 
-    currently_playing = api.get_currently_playing
+    if me = api.get_me
+      user = User.where(email: me['email']).first_or_initialize
+      user.spotify_access_token = access_token
+      user.spotify_refresh_token = refresh_token
 
-    "Current track: #{currently_playing}"
+      if user.save
+        "Signed in as #{user.email}"
+      else
+        "Failed to sign in: #{user.errors.full_messages.join(', ')}"
+      end
+    end
   else
-    "Failed to authenticate"
+    "Failed to authenticate with Spotify"
   end
 end
