@@ -16,13 +16,15 @@ ActiveRecord::Schema.define(version: 20170415163133) do
   enable_extension "plpgsql"
 
   create_table "slack_tokens", force: :cascade do |t|
-    t.integer  "user_id",    null: false
-    t.string   "team_id",    null: false
-    t.string   "team_name",  null: false
-    t.string   "token",      null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id", "team_id"], name: "index_slack_tokens_on_user_id_and_team_id", unique: true, using: :btree
+    t.integer  "user_id",       null: false
+    t.string   "token",         null: false
+    t.string   "team_id",       null: false
+    t.string   "team_name",     null: false
+    t.string   "slack_user_id", null: false
+    t.string   "user_name",     null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.index ["user_id", "team_id", "slack_user_id"], name: "index_slack_tokens_on_user_id_and_team_id_and_slack_user_id", unique: true, using: :btree
     t.index ["user_id"], name: "index_slack_tokens_on_user_id", using: :btree
   end
 
