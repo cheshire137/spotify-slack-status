@@ -130,9 +130,6 @@ get '/user/:id-:user_name/:team_id' do
   end
 
   slack_api = SlackApi.new(@slack_token.token)
-  if team_info = slack_api.get_team
-    @team_image = team_info['icon']['image_44']
-  end
 
   @client_id = ENV['SLACK_CLIENT_ID']
   @redirect_uri = escape_url("#{request.base_url}/callback/slack")
@@ -200,12 +197,14 @@ get '/callback/slack' do
   if token
     slack_api = SlackApi.new(token)
 
-    if team_info = slack_api.get_team
+    if info = slack_api.get_info
       slack_token = SlackToken.
         where(user_id: session[:user_id],
-              team_id: team_info['id']).first_or_initialize
+              team_id: info['team_id'],
+              slack_user_id: info['user_id']).first_or_initialize
       slack_token.token = token
-      slack_token.team_name = team_info['name']
+      slack_token.team_name = info['team']
+      slack_token.user_name = info['user']
 
       if slack_token.save
         redirect "/user/#{slack_token.user.to_param}/#{slack_token.team_id}"

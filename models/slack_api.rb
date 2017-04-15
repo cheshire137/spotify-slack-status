@@ -5,13 +5,13 @@ class SlackApi < Fetcher
     super('https://slack.com/api', token)
   end
 
-  # https://api.slack.com/methods/team.info
-  def get_team
-    json = get("/team.info?token=#{token}")
+  # https://api.slack.com/methods/auth.test
+  def get_info
+    json = get("/auth.test?token=#{token}")
 
     return unless json && json['ok']
 
-    json['team']
+    json
   end
 
   # https://api.slack.com/methods/users.profile.set

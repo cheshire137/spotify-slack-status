@@ -30,12 +30,9 @@
   <section class="section">
     <div class="container content">
       <p class="has-text-centered">
-        You are signed in as <strong><%= @user.email %></strong>.
-        You are authenticated with the
-        <% if @team_image.present? %>
-          <img class="avatar" src="<%= @team_image %>" alt="<%= @slack_token.team_name %> icon" width="22" height="22">
-        <% end %>
-        <strong><%= @slack_token.team_name %></strong>
+        You are signed into Spotify as <strong><%= @user.email %></strong>.
+        You are authenticated as <strong><%= @slack_token.user_name %></strong>
+        with the <strong><%= @slack_token.team_name %></strong>
         team on Slack.
       </p>
       <% if @currently_playing.present? %>
