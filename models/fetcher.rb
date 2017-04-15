@@ -21,7 +21,11 @@ class Fetcher
 
     res = http.request(req)
     if res.kind_of? Net::HTTPSuccess
-      JSON.parse(res.body)
+      begin
+        JSON.parse(res.body)
+      rescue JSON::ParserError
+        nil
+      end
     elsif res.code == '401'
       raise Unauthorized, res.message
     end

@@ -220,15 +220,33 @@ post '/command/spotify-status' do
     end
   end
 
-  status = "Listening to: #{currently_playing}"
-  slack_api = SlackApi.new(slack_token.token)
-  success = slack_api.set_status(status)
+  if currently_playing.present?
+    status = currently_playing
+    slack_api = SlackApi.new(slack_token.token)
+    success = slack_api.set_status(status)
 
-  if success
-    status
+    if success
+      content_type :json
+      json = {
+        text: 'Updated your Slack status.',
+        attachments: [
+          { title: ":musical_note: #{status}" }
+        ]
+      }
+      json.to_json
+    else
+      status 400
+      'Could not update Slack status'
+    end
   else
-    status 400
-    'Could not update Slack status'
+    content_type :json
+    json = {
+      text: 'Did not update your Slack status.',
+      attachments: [
+        { title: "Are you listening to anything on Spotify?" }
+      ]
+    }
+    json.to_json
   end
 end
 
