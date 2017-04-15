@@ -10,6 +10,10 @@ class User < ActiveRecord::Base
   end
 
   def signed_into_slack?
-    slack_access_token.present?
+    slack_tokens.count > 0
+  end
+
+  def latest_slack_token
+    slack_tokens.order("updated_at DESC").first
   end
 end

@@ -8,6 +8,7 @@ require 'dotenv/load'
 
 require_relative 'models/slack_auth_api'
 require_relative 'models/slack_api'
+require_relative 'models/slack_token'
 require_relative 'models/spotify_auth_api'
 require_relative 'models/spotify_api'
 require_relative 'models/user'
@@ -113,10 +114,10 @@ get '/user/:id-:user_name' do
     end
   end
 
-  slack_api = SlackApi.new(@user.slack_access_token)
-  team_info = slack_api.get_team
-  if team_info
-    @team_name = team_info['name']
+  @slack_token = @user.latest_slack_token
+
+  slack_api = SlackApi.new(@slack_token.token)
+  if team_info = slack_api.get_team
     @team_image = team_info['icon']['image_44']
   end
 
@@ -158,15 +159,23 @@ get '/callback/slack' do
   token = slack_auth_api.get_token(code, redirect_uri)
 
   if token
-    user = User.find(session[:user_id])
-    user.slack_access_token = token
+    slack_api = SlackApi.new(token)
 
-    if user.save
-      session[:user_id] = user.id
-      redirect "/user/#{user.to_param}"
+    if team_info = slack_api.get_team
+      slack_token = SlackToken.new(user_id: session[:user_id])
+      slack_token.token = token
+      slack_token.team_id = team_info['id']
+      slack_token.team_name = team_info['name']
+
+      if slack_token.save
+        redirect "/user/#{slack_token.user.to_param}"
+      else
+        status 422
+        "Failed to save Slack team info: #{slack_token.errors.full_messages.join(', ')}"
+      end
     else
-      status 422
-      "Failed to update your Spotify Slack Status user info with Slack details."
+      status 400
+      "Failed to load Slack team information."
     end
   else
     status 401

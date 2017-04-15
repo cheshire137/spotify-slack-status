@@ -9,6 +9,8 @@ class CreateSlackTokens < ActiveRecord::Migration[5.0]
       t.string :token, null: false
       t.timestamps null: false
     end
+
+    add_index :slack_tokens, [:user_id, :team_id], unique: true
   end
 
   def down
