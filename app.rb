@@ -3,6 +3,7 @@ require 'json'
 require 'net/http'
 require 'uri'
 require 'sinatra'
+require 'sinatra/activerecord'
 require 'dotenv/load'
 
 require_relative 'models/spotify_auth_api'
