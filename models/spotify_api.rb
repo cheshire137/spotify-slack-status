@@ -4,6 +4,11 @@ class SpotifyApi
     @base_url = 'https://api.spotify.com/v1'
   end
 
+  # "https://open.spotify.com/user/wizzler" => "wizzler"
+  def self.get_user_name(url)
+    url.split('/user/').last
+  end
+
   # https://developer.spotify.com/web-api/get-the-users-currently-playing-track/
   def get_currently_playing
     json = get('/me/player/currently-playing')

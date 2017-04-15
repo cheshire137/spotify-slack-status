@@ -17,11 +17,13 @@ ActiveRecord::Schema.define(version: 20170415010554) do
 
   create_table "users", force: :cascade do |t|
     t.string   "email"
+    t.string   "user_name"
     t.string   "spotify_access_token"
     t.string   "spotify_refresh_token"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["user_name"], name: "index_users_on_user_name", using: :btree
   end
 
 end

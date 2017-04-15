@@ -45,6 +45,7 @@ get '/callback/spotify' do
       user = User.where(email: me['email']).first_or_initialize
       user.spotify_access_token = access_token
       user.spotify_refresh_token = refresh_token
+      user.user_name = SpotifyApi.get_user_name(me['external_urls']['spotify'])
 
       if user.save
         "Signed in as #{user.email}"
