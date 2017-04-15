@@ -236,7 +236,17 @@ post '/command/spotify-status' do
       json.to_json
     else
       status 400
-      'Could not update Slack status'
+      content_type :json
+      json = {
+        text: 'Could not update Slack status.',
+        attachments: [
+          {
+            title: 'Sign in with Spotify',
+            title_link: get_spotify_auth_url
+          }
+        ]
+      }
+      json.to_json
     end
   else
     content_type :json
