@@ -17,7 +17,9 @@ bundle install
 cp dotenv.sample .env
 ```
 
-Edit .env to set your Spotify and Slack client IDs and secrets.
+Edit .env to set your Spotify and Slack client IDs and secrets. Run
+`rake generate:secret` and put the output of that as the `SESSION_SECRET`
+value in your `.env`.
 
 ```bash
 createdb spotify_slack_status_dev

@@ -2,3 +2,4 @@ export SPOTIFY_CLIENT_ID=your_spotify_app_client_id
 export SPOTIFY_CLIENT_SECRET=your_spotify_app_client_secret
 export SLACK_CLIENT_ID=your_slack_app_client_id
 export SLACK_CLIENT_SECRET=your_slack_app_client_secret
+export SESSION_SECRET=generate_a_session_secret_for_this
