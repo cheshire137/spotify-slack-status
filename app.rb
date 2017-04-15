@@ -62,6 +62,8 @@ end
 # User is authenticated with both Spotify and Slack.
 get '/user/:id-:user_name' do
   @user = User.where(id: params['id'], user_name: params['user_name']).first
+  spotify_api = SpotifyApi.new(@user.spotify_access_token)
+  @currently_playing = spotify_api.get_currently_playing
 
   if @user
     erb :fully_signed_in

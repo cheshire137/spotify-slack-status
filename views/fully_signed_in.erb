@@ -18,6 +18,17 @@
   <section class="section">
     <div class="container content">
       <p>You are signed in as <strong><%= @user.email %></strong>.</p>
+      <% if @currently_playing.present? %>
+        <p>
+          Listening to: <%= @currently_playing %>
+        </p>
+        <form method="POST" action="/update-status">
+          <input type="hidden" name="status" value="Listening to: <%= @currently_playing.gsub(/"/, "'") %>">
+          <button type="submit" class="button is-primary">
+            Update Slack Status
+          </button>
+        </form>
+      <% end %>
     </div>
   </section>
 </body>
