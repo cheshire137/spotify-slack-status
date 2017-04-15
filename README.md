@@ -1,6 +1,14 @@
-# spotify-slack-status
+# Spotify Slack Status
 
 Update your Slack status based on the track currently playing in Spotify.
+
+You can update your status in two ways:
+
+- Once you've deployed your app to Heroku (see below), visit
+  `https://your-heroku-app.herokuapp.com/` to sign in with Spotify and
+  Slack, then hit "Update Slack Status".
+- Once you have installed the app into your team's Slack, you can run
+  the command `/spotify-status` from within Slack.
 
 ## How to Develop
 
@@ -9,8 +17,12 @@ You will need PostgreSQL, Bundler, RubyGems, and Ruby installed.
 Create a [Spotify app](https://developer.spotify.com/my-applications/#!/).
 Add `http://localhost:9292/callback/spotify` as a redirect URI.
 
+Create a [Heroku app](https://dashboard.heroku.com/apps).
+
 Create a [Slack app](https://api.slack.com/apps). Add
-`http://localhost:9292/callback/slack` as a redirect URI.
+`http://localhost:9292/callback/slack` as a redirect URI. Set up a
+"Slash Command" on your app with the name `/spotify-status` and
+the request URL `https://your-heroku-app.herokuapp.com/command/spotify-status`.
 
 ```bash
 bundle install
@@ -30,7 +42,6 @@ open http://localhost:9292/
 
 ## Deploying to Heroku
 
-Create a [Heroku app](https://dashboard.heroku.com/apps).
 Set `https://your-heroku-app.herokuapp.com/callback/spotify`
 as a redirect URI on your Spotify app. Set
 `https://your-heroku-app.herokuapp.com/callback/slack` as a redirect
