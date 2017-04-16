@@ -172,8 +172,8 @@ post '/command/spotify-status' do
     return 'Invalid command'
   end
 
-  slack_token = SlackToken.where(team_id: params['team_id'],
-                                 slack_user_id: params['user_id']).first
+  slack_token = SlackToken.for_team(params['team_id']).
+    for_slack_user(params['user_id']).first
 
   unless slack_token
     content_type :json
