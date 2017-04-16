@@ -8,4 +8,6 @@ class SlackToken < ActiveRecord::Base
   scope :for_team, ->(team) { where(team_id: team) }
 
   scope :for_slack_user, ->(id) { where(slack_user_id: id) }
+
+  scope :for_user, ->(user) { where(user_id: user) }
 end

@@ -299,10 +299,9 @@ get '/callback/slack' do
     slack_api = SlackApi.new(token)
 
     if info = slack_api.get_info
-      slack_token = SlackToken.
-        where(user_id: session[:user_id],
-              team_id: info['team_id'],
-              slack_user_id: info['user_id']).first_or_initialize
+      slack_token = SlackToken.for_team(info['team_id']).
+        for_slack_user(info['user_id']).
+        for_user(session[:user_id]).first_or_initialize
       slack_token.token = token
       slack_token.team_name = info['team']
       slack_token.user_name = info['user']
