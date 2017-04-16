@@ -36,22 +36,6 @@ def get_slack_auth_url
     "&scope=#{scope}&redirect_uri=#{redirect_uri}"
 end
 
-# Updates the Spotify access and refresh tokens for the given User.
-# Returns true on success, false or nil on error.
-def update_spotify_tokens(user)
-  spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
-                                        ENV['SPOTIFY_CLIENT_SECRET'])
-  tokens = spotify_auth_api.refresh_tokens(user.spotify_refresh_token)
-
-  if tokens
-    user.spotify_access_token = tokens['access_token']
-    if (refresh_token = tokens['refresh_token']).present?
-      user.spotify_refresh_token = refresh_token
-    end
-    user.save
-  end
-end
-
 enable :sessions
 set :session_secret, ENV['SESSION_SECRET']
 
@@ -113,7 +97,7 @@ get '/user/:id-:user_name/:team_id' do
   @currently_playing = begin
     spotify_api.get_currently_playing
   rescue Fetcher::Unauthorized
-    if update_spotify_tokens(@user)
+    if @user.update_spotify_tokens
       spotify_api = SpotifyApi.new(@user.spotify_access_token)
       spotify_api.get_currently_playing
     else
@@ -195,7 +179,7 @@ post '/command/spotify-status' do
   currently_playing = begin
     spotify_api.get_currently_playing
   rescue Fetcher::Unauthorized
-    if update_spotify_tokens(user)
+    if user.update_spotify_tokens
       spotify_api = SpotifyApi.new(user.spotify_access_token)
       spotify_api.get_currently_playing
     else

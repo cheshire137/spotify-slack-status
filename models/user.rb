@@ -25,4 +25,20 @@ class User < ActiveRecord::Base
       map { |slack_token| [slack_token.team_id, slack_token.team_name] }.
       to_h
   end
+
+  # Updates the Spotify access and refresh tokens for the given User.
+  # Returns true on success, false or nil on error.
+  def update_spotify_tokens
+    spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
+                                          ENV['SPOTIFY_CLIENT_SECRET'])
+    tokens = spotify_auth_api.refresh_tokens(spotify_refresh_token)
+
+    if tokens
+      self.spotify_access_token = tokens['access_token']
+      if (refresh_token = tokens['refresh_token']).present?
+        self.spotify_refresh_token = refresh_token
+      end
+      save
+    end
+  end
 end
