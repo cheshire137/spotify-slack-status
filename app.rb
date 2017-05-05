@@ -309,7 +309,7 @@ end
 # Callback for Spotify OAuth authentication.
 get '/callback/spotify' do
   code = params['code']
-  redirect_uri = escape_url("#{request.base_url}/callback/spotify")
+  redirect_uri = "#{request.base_url}/callback/spotify"
 
   spotify_auth_api = SpotifyAuthApi.new(ENV['SPOTIFY_CLIENT_ID'],
                                         ENV['SPOTIFY_CLIENT_SECRET'])
