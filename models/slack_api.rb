@@ -19,6 +19,10 @@ class SlackApi < Fetcher
     json
   end
 
+  def self.valid_status?(status)
+    status && status.length > 0 && status.length <= 100
+  end
+
   # https://api.slack.com/methods/users.profile.set
   def set_status(status)
     profile = {

@@ -27,26 +27,41 @@
     <% if @currently_playing.present? %>
       <div class="columns">
         <div class="column is-half is-offset-one-quarter">
-          <form method="POST" action="/update-status/<%= @slack_token.id %>" class="box">
-            <article class="media">
-              <div class="media-content">
-                <p>
-                  🎵 <%= @currently_playing %>
-                </p>
-                <input type="hidden" name="status" value="<%= @currently_playing.gsub(/"/, "'") %>">
-                <p>
-                  <button type="submit" class="button is-slack">
-                    Update Slack Status
-                  </button>
-                </p>
-                <p>
-                  <strong>Tip:</strong>
-                  you can also run <code>/spotify-status</code>
-                  from Slack.
-                </p>
-              </div>
-            </article>
-          </form>
+          <% if @valid_status %>
+            <form method="POST" action="/update-status/<%= @slack_token.id %>" class="box">
+              <article class="media">
+                <div class="media-content">
+                  <p>
+                    🎵 <%= @currently_playing %>
+                  </p>
+                  <input type="hidden" name="status" value="<%= @currently_playing.gsub(/"/, "'") %>">
+                  <p>
+                    <button type="submit" class="button is-slack">
+                      Update Slack Status
+                    </button>
+                  </p>
+                  <p>
+                    <strong>Tip:</strong>
+                    you can also run <code>/spotify-status</code>
+                    from Slack.
+                  </p>
+                </div>
+              </article>
+            </form>
+          <% else %>
+            <div class="box">
+              <article class="media">
+                <div class="media-content">
+                  <p>
+                    🎵 <%= @currently_playing %>
+                  </p>
+                  <p class="help">
+                    This is too long to use as a Slack status.
+                  </p>
+                </div>
+              </article>
+            </div>
+          <% end %>
         </div>
       </div>
     <% end %>

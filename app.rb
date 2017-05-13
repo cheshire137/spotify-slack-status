@@ -119,6 +119,7 @@ get '/user/:id-:user_name/:team_id' do
   @redirect_uri = escape_url("#{request.base_url}/callback/slack")
 
   @other_slacks = @user.other_slacks(@slack_token.id)
+  @valid_status = SlackApi.valid_status?(@currently_playing)
 
   erb :fully_signed_in
 end
