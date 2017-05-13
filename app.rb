@@ -100,12 +100,12 @@ get '/user/:id-:user_name/:team_id' do
     return
   end
 
-  spotify_api = SpotifyApi.new(@user.spotify_access_token)
+  spotify_api = SpotifyApi.new(@user.spotify_access_token, logger: logger)
   @currently_playing = begin
     spotify_api.get_currently_playing
   rescue Fetcher::Unauthorized
     if @user.update_spotify_tokens
-      spotify_api = SpotifyApi.new(@user.spotify_access_token)
+      spotify_api = SpotifyApi.new(@user.spotify_access_token, logger: logger)
       spotify_api.get_currently_playing
     else
       status 400
@@ -113,7 +113,7 @@ get '/user/:id-:user_name/:team_id' do
     end
   end
 
-  slack_api = SlackApi.new(@slack_token.token)
+  slack_api = SlackApi.new(@slack_token.token, logger: logger)
 
   @client_id = ENV['SLACK_CLIENT_ID']
   @redirect_uri = escape_url("#{request.base_url}/callback/slack")
@@ -182,12 +182,12 @@ post '/command/spotify-status' do
 
   user = slack_token.user
 
-  spotify_api = SpotifyApi.new(user.spotify_access_token)
+  spotify_api = SpotifyApi.new(user.spotify_access_token, logger: logger)
   currently_playing = begin
     spotify_api.get_currently_playing
   rescue Fetcher::Unauthorized
     if user.update_spotify_tokens
-      spotify_api = SpotifyApi.new(user.spotify_access_token)
+      spotify_api = SpotifyApi.new(user.spotify_access_token, logger: logger)
       spotify_api.get_currently_playing
     else
       status 400
@@ -197,7 +197,7 @@ post '/command/spotify-status' do
 
   if currently_playing.present?
     status = currently_playing
-    slack_api = SlackApi.new(slack_token.token)
+    slack_api = SlackApi.new(slack_token.token, logger: logger)
     success = slack_api.set_status(status)
 
     if success
@@ -259,7 +259,7 @@ post '/update-status/:slack_token_id' do
     return
   end
 
-  slack_api = SlackApi.new(slack_token.token)
+  slack_api = SlackApi.new(slack_token.token, logger: logger)
   success = slack_api.set_status(params['status'])
 
   if success
@@ -287,7 +287,7 @@ get '/callback/slack' do
   token = slack_auth_api.get_token(code, redirect_uri)
 
   if token
-    slack_api = SlackApi.new(token)
+    slack_api = SlackApi.new(token, logger: logger)
 
     if info = slack_api.get_info
       slack_token = SlackToken.for_team(info['team_id']).
@@ -325,7 +325,7 @@ get '/callback/spotify' do
   if tokens
     access_token = tokens['access_token']
     refresh_token = tokens['refresh_token']
-    spotify_api = SpotifyApi.new(access_token)
+    spotify_api = SpotifyApi.new(access_token, logger: logger)
 
     if me = spotify_api.get_me
       user = User.where(email: me['email']).first_or_initialize

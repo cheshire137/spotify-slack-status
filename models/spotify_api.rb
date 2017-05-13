@@ -1,8 +1,8 @@
 require_relative 'fetcher'
 
 class SpotifyApi < Fetcher
-  def initialize(token)
-    super('https://api.spotify.com/v1', token)
+  def initialize(token, logger:)
+    super('https://api.spotify.com/v1', token: token, logger: logger)
   end
 
   # "https://open.spotify.com/user/wizzler" => "wizzler"
@@ -12,9 +12,14 @@ class SpotifyApi < Fetcher
 
   # https://developer.spotify.com/web-api/get-the-users-currently-playing-track/
   def get_currently_playing
-    json = get('/me/player/currently-playing')
+    path = '/me/player/currently-playing'
+    logger.info "GET #{base_url}#{path}"
+    json = get(path)
 
-    return unless json
+    unless json
+      logger.error "#{response_code} #{response_body}"
+      return
+    end
 
     item = json['item']
     name = item['name']
@@ -25,9 +30,14 @@ class SpotifyApi < Fetcher
 
   # https://developer.spotify.com/web-api/get-current-users-profile/
   def get_me
-    json = get('/me')
+    path = '/me'
+    logger.info "GET #{base_url}#{path}"
+    json = get(path)
 
-    return unless json
+    unless json
+      logger.error "#{response_code} #{response_body}"
+      return
+    end
 
     json
   end
