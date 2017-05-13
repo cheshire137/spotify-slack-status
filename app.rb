@@ -36,6 +36,13 @@ def get_slack_auth_url
     "&scope=#{scope}&redirect_uri=#{redirect_uri}"
 end
 
+configure do
+  file = File.new("#{settings.root}/log/#{settings.environment}.log", 'a+')
+  file.sync = true
+
+  use Rack::CommonLogger, file
+end
+
 enable :sessions
 set :session_secret, ENV['SESSION_SECRET']
 
