@@ -198,38 +198,49 @@ post '/command/spotify-status' do
 
   if currently_playing.present?
     status = currently_playing
-    slack_api = SlackApi.new(slack_token.token, logger: logger)
-    success = slack_api.set_status(status)
+    if SlackApi.valid_status?(status)
+      slack_api = SlackApi.new(slack_token.token, logger: logger)
+      success = slack_api.set_status(status)
 
-    if success
+      if success
+        content_type :json
+        json = {
+          text: 'Updated your Slack status.',
+          attachments: [
+            { title: ":musical_note: #{status}" }
+          ]
+        }
+        json.to_json
+      else # error setting status
+        status 400
+        content_type :json
+        json = {
+          text: 'Could not update Slack status.',
+          attachments: [
+            {
+              title: 'Sign in with Spotify',
+              title_link: get_spotify_auth_url
+            }
+          ]
+        }
+        json.to_json
+      end
+    else # invalid status
       content_type :json
       json = {
-        text: 'Updated your Slack status.',
+        text: 'Did not update your Slack status.',
         attachments: [
-          { title: ":musical_note: #{status}" }
-        ]
-      }
-      json.to_json
-    else
-      status 400
-      content_type :json
-      json = {
-        text: 'Could not update Slack status.',
-        attachments: [
-          {
-            title: 'Sign in with Spotify',
-            title_link: get_spotify_auth_url
-          }
+          { title: "Sorry, the name of the song you're listening to is too long. :cry:" }
         ]
       }
       json.to_json
     end
-  else
+  else # no current track
     content_type :json
     json = {
       text: 'Did not update your Slack status.',
       attachments: [
-        { title: "Are you listening to anything on Spotify?" }
+        { title: "Are you listening to anything on Spotify? :question: :thinking_face:" }
       ]
     }
     json.to_json
