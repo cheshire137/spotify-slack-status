@@ -17,7 +17,7 @@ class SpotifyApi < Fetcher
     json = get(path)
 
     unless json
-      logger.error "#{response_code} #{response_body}"
+      logger.error("#{response_code} #{response_body}") unless response_code == '200'
       return
     end
 

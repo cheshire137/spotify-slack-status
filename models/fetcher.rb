@@ -26,12 +26,14 @@ class Fetcher
     @response_body = res.body
 
     if res.kind_of? Net::HTTPSuccess
-      begin
-        JSON.parse(res.body)
-      rescue JSON::ParserError
-        nil
+      if @response_body && @response_body.length > 0
+        begin
+          JSON.parse(@response_body)
+        rescue JSON::ParserError
+          nil
+        end
       end
-    elsif res.code == '401'
+    elsif @response_code == '401'
       raise Unauthorized, res.message
     end
   end
